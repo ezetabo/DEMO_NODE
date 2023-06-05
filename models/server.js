@@ -1,29 +1,33 @@
 const express = require('express');
 const cors = require('cors');
+const { dbConnection } = require('../database/config');
+
 
 class Server {
     constructor() {
         this.app = express();
         this.port = process.env.PORT;
-        this.path = '/api/recetas';
+        this.pathRecipes = '/api/recipes';
+        this.pathAuth= '/api/auth';
+
+        this.concectarDB();
         this.middlewares();
         this.routes();
     }
 
-    middlewares() {
+    async concectarDB() {
+        await dbConnection();
+    }
 
-        //cors
-        this.app.use(cors());
-
-        // lectura y parseo del body
-        this.app.use(express.json());
-
-        //directorio publico
+    middlewares() {        
+        this.app.use(cors());       
+        this.app.use(express.json());        
         this.app.use(express.static('public'));
     }
 
     routes() {
-        this.app.use(this.path, require('../routes/recipes'));
+        this.app.use(this.pathRecipes, require('../routes/recipes'));
+        this.app.use(this.pathAuth, require('../routes/auth'));
     }
 
     listen() {
